@@ -55,4 +55,4 @@ print(f"User features matrix shape (users x hotels): {sparse_user_features.shape
 print(f"Number of users: {len(ordered_user_ids)}")
 print(f"Number of users in matrix: {user_item_matrix.shape[0]}")
 
-#(62006, 3428)
+#shape: (62006, 3428)
