@@ -1,0 +1,27 @@
+COMPUTE USER SIMILARITY BASED ON COLUMNS:
+
+solve the cold start problem by prompting user questions:
+
+    location_user	where user wants to go?
+    num_cities	How many different cities do you typically travel to each year?
+    num_reviews_profile	Have you reviewed hotels before?
+    num_helpful_votes_user	Do you often write detailed reviews that others find helpful?
+
+ but also we can check what the user values and create a (composite rating) x hotel_class as weight it is important to use this variable as weight as a lot of users may indicate high standarts but aim for cheaper hotels which have a lower
+ category and look for hotels with similar reviews using the
+ hotel x hotel similarity matrix:
+
+    location,service,cleanliness,overall,value,location,sleep_quality,number_of_rooms,hotel_class_as_weight
+
+FOR USERS THAT ALREADY HAVE ACTIVITY are in the reviews dataser A COLLABORATION BASED SYSTEM:
+ ITEM X USER MATRIX
+ ITEM SIMILARITY MATRIX
+
+
+ strategy approved I will make teh datasets smaller and experiment with different mixes
+ asking a user a lot of questions is a good idea, user might not answer them all
+ we will see!
+
+ but I will create one matrix based on metadata for which I will ask for questions
+ and also one with collaboration data for which I will ask questions to the new user as well
+ I will regulate the influence of these two matrices using alfa beta as weighting parameters
