@@ -1,0 +1,59 @@
+✅ 1. User-Item Interaction Matrix (Collaborative Filtering)
+You generated a user-hotel rating matrix based on a weighted average of multiple review attributes, adjusted by hotel_class.
+
+Inputs used:
+df_reviews with columns like service, cleanliness, etc.
+df_hotels for hotel_class
+Weighting:
+Mean of review columns × hotel_class
+Shape: (62006 users, 3428 hotels)
+Matrix saved as: user_features_collab.npz / user_hotel_matrix.npz
+✅ This forms the foundation for collaborative filtering—standard and correct.
+
+✅ 2. User Profile Feature Matrix (Content-Based User Similarity)
+You engineered user features by combining:
+
+Numeric: num_helpful_votes_user, num_cities, num_reviews_profile
+Text: location_user using TF-IDF (max 500 features)
+Processing steps:
+Missing imputation with median
+Standard scaling
+TF-IDF for text
+Horizontally stacked into a sparse matrix
+Saved as: user_features_sparse.npz
+Mappings saved: user_id_to_idx.json, idx_to_user_id.json
+You then used FAISS to compute top-k similar users and built a sparse user-user similarity matrix (shape = 62006 x 62006).
+
+Saved as: metadata_user_user.npz
+✅ Excellent approach for user-based content similarity using FAISS (very efficient).
+
+✅ 3. Hotel Metadata Feature Matrix (Content-Based Hotel Similarity)
+You engineered hotel features from:
+
+hotel_class (numeric, scaled)
+region, type, locality → all TF-IDF encoded
+These were then:
+
+Horizontally stacked
+Combined with hotel-user matrix (transposed interaction matrix)
+Result: combined_hotel_features = [hotel-user + hotel-meta]
+Used for cosine similarity → hotel-hotel similarity matrix
+Saved as: hotel_similarity_matrix.npz
+Shape: (3428, 3428)
+✅ Perfect for item-based content similarity.
+
+✅ 4. User-User Similarity (Collaborative Filtering)
+You also generated a collaborative similarity matrix between users:
+
+Built from the user-item matrix
+Using cosine_similarity(sparse_user_item, dense_output=False)
+Saved as user_similarity_collab.npz
+Shape: (62006, 62006)
+✅ Complements the metadata-based FAISS similarity.
+
+✅ Mapping Handling
+You were consistent with mappings:
+
+user_id_to_idx, idx_to_user_id
+hotel_id_to_idx, hotel_idx_to_id
+And correctly filtered reviews using those mappings.

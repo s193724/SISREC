@@ -4,6 +4,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.sparse import csr_matrix, hstack, save_npz
 import json
+import joblib
+
 
 # Load user profile data_and_RS
 df_users = pd.read_csv('USER_DF.csv')
@@ -46,3 +48,6 @@ with open('idx_to_user_id.json', 'w') as f:
 save_npz('user_features_sparse.npz', user_features_sparse)
 
 print(f"User features matrix shape: {user_features_sparse.shape}")
+
+joblib.dump(scaler, 'scaler.pkl')
+joblib.dump(vectorizer_location, 'vectorizer_location.pkl')
