@@ -5,6 +5,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.sparse import load_npz, hstack, csr_matrix, vstack
 import joblib
 import json
+import pandas as pd
 
 # --- Load persistent data ---
 user_features_sparse = load_npz('user_features_sparse.npz')
@@ -76,69 +77,104 @@ def cold_start_recommendation(user_id, top_k=10):
 
 
 def cold_start_recommendation_collab(user_id, top_k=10):
-    global user_features_collab
-    global user_item_matrix
+    """
+    Cold start recommendation using user preferences and hotel features,
+    with hard filtering on Number of Rooms and Region.
+    """
+    # Load hotel metadata matrix and other resources
+    hotel_features_sparse = load_npz("hotel_features.npz")
 
-    with open('user_id_to_idx.json', 'r') as f:
-        user_id_to_idx = json.load(f)
-    with open('idx_to_user_id.json', 'r') as f:
-        idx_to_user_id = {int(k): v for k, v in json.load(f).items()}
     with open('hotel_idx_to_id.json', 'r') as f:
         idx_to_hotel_id = {int(k): v for k, v in json.load(f).items()}
 
     ohe = joblib.load('hotel_region_ohe.pkl')
 
-    # Assume median hotel class from your dataset or domain knowledge
-    median_hotel_class = 3.0
+    # Constants for feature indices (adjust if your order changes!)
+    # [service, cleanliness, overall, value, location, sleep_quality, rooms, weighted_score, region_onehot...]
+    hotel_class_idx = 25
+    #weighted_score_idx = 7
+    region_start_idx = 8
 
-    print("Please rate your preferences for the following hotel features (1 = low, 5 = high):")
+    score_weight_factor = 10
+
+    def safe_float(prompt):
+        try:
+            val = input(prompt).strip()
+            return float(val) if val else 0.0
+        except:
+            return 0.0
+
     try:
-        service = float(input("Service: "))
-        cleanliness = float(input("Cleanliness: "))
-        overall = float(input("Overall: "))
-        value = float(input("Value: "))
-        location_pref_score = float(input("Location quality: "))
-        sleep_quality = float(input("Sleep quality: "))
-        rooms = float(input("Room quality: "))
+        # Collect user preferences
+        service = safe_float("Service: ")
+        cleanliness = safe_float("Cleanliness: ")
+        overall = safe_float("Overall: ")
+        value = safe_float("Value: ")
+        location_pref_score = safe_float("Location quality: ")
+        sleep_quality = safe_float("Sleep quality: ")
+        rooms = safe_float("Room quality: ")
+        hotel_class = safe_float("Hotel class: ")
+        #preferred_rooms = int(input("Preferred number of rooms (hard filter): "))
 
-        # Average user preference score
-        avg_score = np.mean([service, cleanliness, overall, value, location_pref_score, sleep_quality, rooms])
-        # Weighted score by median hotel class
-        weighted_score_pref = avg_score * median_hotel_class
+        print("Known regions:", ohe.categories_[0])
+        location_region = input("Preferred hotel location (region) (hard filter): ").strip()
 
-        # Get user location region
-        location_region = input("Preferred hotel location (region): ")
+        if location_region not in ohe.categories_[0]:
+            print(f"Warning: Region '{location_region}' not recognized.")
+            if 'Unknown' in ohe.categories_[0]:
+                location_region = 'Unknown'
+            else:
+                location_region = ohe.categories_[0][0]
+            print(f"Using region '{location_region}' instead.")
+
+        # Encode region
         location_encoded = ohe.transform([[location_region]]).toarray().flatten()
 
-        # Build user feature vector: weighted score + region one-hot vector
-        user_pref_vector = np.hstack(([weighted_score_pref], location_encoded))
+        # User categories vector
+        user_categories = [service, cleanliness, overall, value, location_pref_score, sleep_quality, rooms]
 
+        if any(pd.isna(user_categories)):
+            raise ValueError("One or more category preferences are NaN!")
+
+        avg_score = np.mean(user_categories)
+        median_hotel_class = 3.0  # or pull from somewhere else if you want
+        weighted_score_pref = avg_score * median_hotel_class * score_weight_factor
+
+        # Build full user preference vector with weighted score and region encoding
+        user_pref_vector = np.hstack((user_categories, [weighted_score_pref], location_encoded, hotel_class))
         cold_user_vector = csr_matrix(user_pref_vector).reshape(1, -1)
 
-        similarities = cosine_similarity(cold_user_vector, user_features_collab)[0]
+        # Extract rooms and region columns from hotel features
+        hotel_class_col = hotel_features_sparse[:, hotel_class_idx].toarray().flatten()
+        region_cols = hotel_features_sparse[:, region_start_idx:].toarray()
 
-        scores = similarities @ user_item_matrix
-        scores = np.array(scores).flatten()
+        # Filter hotels by rooms exact match
+        hotel_class_mask = (hotel_class_col == hotel_class)
 
-        top_indices = np.argsort(scores)[::-1][:top_k]
-        top_hotels = [(idx_to_hotel_id[i], scores[i]) for i in top_indices]
+        # Filter hotels by region exact match
+        region_idx_in_ohe = list(ohe.categories_[0]).index(location_region)
+        region_mask = (region_cols[:, region_idx_in_ohe] == 1)
 
-        # Update mappings and matrices
-        new_idx = len(user_id_to_idx)
-        user_id_to_idx[user_id] = new_idx
-        idx_to_user_id[new_idx] = user_id
+        # Combine masks for hard filtering
+        combined_mask = region_mask & hotel_class_mask
 
-        user_features_collab = vstack([user_features_collab, cold_user_vector])
-        user_item_matrix = vstack([user_item_matrix, csr_matrix((1, user_item_matrix.shape[1]))])
+        # Filter hotel features matrix to filtered hotels only
+        hotel_features_filtered = hotel_features_sparse[combined_mask]
 
-        with open('user_id_to_idx.json', 'w') as f:
-            json.dump(user_id_to_idx, f)
-        with open('idx_to_user_id.json', 'w') as f:
-            json.dump({k: v for k, v in idx_to_user_id.items()}, f)
+        # Compute cosine similarity between user vector and filtered hotel features
+        similarities = cosine_similarity(cold_user_vector, hotel_features_filtered)[0]
+
+        # Get top-k indices within filtered hotels
+        top_indices_filtered = np.argsort(similarities)[::-1][:top_k]
+
+        # Map filtered indices back to original hotel indices
+        original_indices = np.where(combined_mask)[0]
+        top_indices_original = original_indices[top_indices_filtered]
+
+        top_hotels = [(idx_to_hotel_id[i], similarities[j]) for j, i in enumerate(top_indices_original)]
 
         return top_hotels
 
     except Exception as e:
         print(f"Error: {e}")
         return []
-

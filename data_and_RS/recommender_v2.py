@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.sparse import load_npz
+
 from sklearn.preprocessing import normalize
 import json
 from recommender_cold_start_def import cold_start_recommendation, cold_start_recommendation_collab
@@ -59,7 +60,7 @@ def hybrid_recommend(user_id, alpha=0.7, top_k=10):
 
 
 # --- Example usage ---
-user_id = "F8A98143F91F88CF3CDDE43932D4B5A"  # replace with real user
+user_id = "24DD21D825BF7F9BE42DC64AE973D17B"  # replace with real user
 recommendations = hybrid_recommend(user_id, alpha=0.6, top_k=10)
 print("Top recommendations:")
 for hotel_id, score in recommendations:
