@@ -7,10 +7,10 @@ import json
 import joblib
 
 
-# Load user profile data_and_RS
+# Load user profile Recommendation_System_Logic&Code
 df_users = pd.read_csv('USER_DF.csv')
 
-# Example numeric columns - adjust according to your data_and_RS
+# Example numeric columns - adjust according to your Recommendation_System_Logic&Code
 numeric_cols = ['num_helpful_votes_user', 'num_cities', 'num_reviews_profile']
 
 # Handle missing numeric values by filling median

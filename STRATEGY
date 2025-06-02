@@ -42,3 +42,81 @@ FOR USERS THAT ALREADY HAVE ACTIVITY are in the reviews dataser A COLLABORATION 
  but I will create one matrix based on metadata for which I will ask for questions
  and also one with collaboration data for which I will ask questions to the new user as well
  I will regulate the influence of these two matrices using alfa beta as weighting parameters
+
+
+
+ changes that are nice to know about:
+
+ if np.sum(user_sim_scores) > 0:
+    collab_scores = (user_sim_scores @ user_item_matrix) / np.sum(user_sim_scores)
+
+ this peace of code makes collaborative score weighting invariant to how many similar users exist.
+
+ 1. Hybrid Recommendation Strategy
+You combine:
+
+Collaborative Filtering (CF): Using user_similarity and the user_item_matrix.
+Content-Based Filtering (CB): Using hotel-to-hotel similarity and a user's own past ratings.
+This hybrid approach helps overcome the weaknesses of each method:
+
+CF struggles with cold-start users/items.
+CB can't capture user taste evolution well.
+💡 You're using a tunable weight (alpha) — that's great for flexibility.
+
+🧠 2. Cold Start Handling
+You handle new users with:
+
+Metadata-based user similarity (mode='user')
+Direct hotel preference matching (mode='hotel')
+That’s an excellent design decision: you're not forcing a single fallback method but instead asking the user how they'd prefer to get started.
+
+🧮 3. Proper Score Normalization
+You normalize the collaborative and content scores before combining them. This prevents one vector from dominating due to scale differences — a best practice that many forget.
+
+4. Excluding Already Rated Hotels
+Good use of:
+
+rated_indices = np.where(user_ratings > 0)[0]
+hybrid_scores[rated_indices] = 0
+
+
+Biased Model towards new york:
+
+Why So Many Recommendations Are for New York City
+The hotel distribution in your dataset is heavily skewed toward certain cities:
+
+🗽 New York City has the most hotels (362), which is nearly 40% more than the next city (Houston).
+This overrepresentation affects:
+Collaborative filtering, because more users have interacted with New York hotels → more similarity signal.
+Content-based filtering, if similarity is based on hotel features like city → again, more hotels = more similar candidates.
+Cold-start user-based, where weighted user-item interactions pull from the dominant pool of available hotels.
+
+
+Introducing Penalty for Dominant number of hotels in certai locations to make model less biased:
+
+How the Penalty Works
+🧩 Step-by-step:
+
+Original Score:
+Each hotel has a recommendation score from the hybrid model (e.g., 0.87).
+Look Up City:
+Find the city that hotel belongs to using the hotel_metadata.csv.
+Apply Penalty:
+Multiply the score by a penalty factor:
+adjusted_score = original_score * penalty_factor
+NYC gets 0.6 → its scores are reduced by 40%.
+Houston gets 0.85 → scores reduced by 15%.
+Smaller cities keep their full score (1.0 or no penalty).
+Re-rank:
+After applying penalties, re-sort the list of hotels by adjusted score. This lets hotels from smaller or underrepresented cities bubble up if they have decent scores.
+🎯 Example
+Hotel ID	City	Score (before)	Penalty	Score (after)
+H123	New York City	0.95	0.6	0.57
+H234	San Diego	0.82	1.0	0.82
+H345	Chicago	0.78	1.0	0.78
+Without penalty, NYC wins. With penalty, San Diego becomes top.
+
+✅ Why It's Useful
+Encourages geographic diversity.
+Reduces dominance of large cities just due to data imbalance.
+Still respects the scores — NYC hotels can still appear, just not monopolize.

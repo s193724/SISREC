@@ -5,12 +5,12 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 # --- Define matrix paths ---
 paths = {
-    "hotel_hotel_sim": "/Users/filiporlikowski/Documents/SISREC_PROJECT/data_and_RS/hotel_similarity_matrix.npz",
-    "metadata_user_user": "/Users/filiporlikowski/Documents/SISREC_PROJECT/data_and_RS/metadata_user_user.npz",
-    "user_similarity_collab": "/Users/filiporlikowski/Documents/SISREC_PROJECT/data_and_RS/user_similarity_collab.npz",
-    "user_features_collab": "/Users/filiporlikowski/Documents/SISREC_PROJECT/data_and_RS/user_features_collab.npz",
-    "user_features_sparse": "/Users/filiporlikowski/Documents/SISREC_PROJECT/data_and_RS/user_features_sparse.npz",
-    "hotel_user_sparse": "/Users/filiporlikowski/Documents/SISREC_PROJECT/data_and_RS/user_hotel_matrix.npz"
+    "hotel_hotel_sim": "/Users/filiporlikowski/Documents/SISREC_PROJECT/Recommendation_System_Logic&Code/hotel_similarity_matrix.npz",
+    "metadata_user_user": "/Users/filiporlikowski/Documents/SISREC_PROJECT/Recommendation_System_Logic&Code/metadata_user_user.npz",
+    "user_similarity_collab": "/Users/filiporlikowski/Documents/SISREC_PROJECT/Recommendation_System_Logic&Code/user_similarity_collab.npz",
+    "user_features_collab": "/Users/filiporlikowski/Documents/SISREC_PROJECT/Recommendation_System_Logic&Code/user_features_collab.npz",
+    "user_features_sparse": "/Users/filiporlikowski/Documents/SISREC_PROJECT/Recommendation_System_Logic&Code/user_features_sparse.npz",
+    "hotel_user_sparse": "/Users/filiporlikowski/Documents/SISREC_PROJECT/Recommendation_System_Logic&Code/user_hotel_matrix.npz"
 }
 
 def describe_sparse_matrix(name, matrix):
