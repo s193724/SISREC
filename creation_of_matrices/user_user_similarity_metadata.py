@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.sparse import csr_matrix, save_npz
 
-# Step 1: Load Recommendation_System_Logic&Code
+# Step 1: Load Recommendation_System_Logic_Code
 df_profiles = pd.read_csv("USER_DF.csv")
 
 numeric_cols = ['num_helpful_votes_user', 'num_cities', 'num_reviews_profile']

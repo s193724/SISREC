@@ -4,20 +4,21 @@ from scipy.sparse import load_npz
 from sklearn.preprocessing import normalize
 import json
 
-from recommender_cold_start_def import cold_start_recommendation, cold_start_recommendation_collab, cold_start_recommendation_combined, apply_city_penalty
+from Recommendation_System_Logic_Code.recommender_cold_start_def import cold_start_recommendation, cold_start_recommendation_collab, cold_start_recommendation_combined, apply_city_penalty
 
+base_dir = '/Users/filiporlikowski/Documents/SISREC_PROJECT/Recommendation_System_Logic_Code/'
 # --- Load data ---
-user_item_matrix = load_npz('user_hotel_matrix.npz')
-user_similarity = load_npz('user_similarity_collab.npz')
-hotel_similarity = load_npz('hotel_similarity_matrix.npz')
+user_item_matrix = load_npz(f'{base_dir}user_hotel_matrix.npz')
+user_similarity = load_npz(f'{base_dir}user_similarity_collab.npz')
+hotel_similarity = load_npz(f'{base_dir}hotel_similarity_matrix.npz')
 
-with open('user_id_to_idx.json') as f:
+with open(f'{base_dir}user_id_to_idx.json') as f:
     user_id_to_idx = json.load(f)
-with open('idx_to_user_id.json') as f:
+with open(f'{base_dir}idx_to_user_id.json') as f:
     idx_to_user_id = {int(k): v for k, v in json.load(f).items()}
-with open('hotel_id_to_idx.json') as f:
+with open(f'{base_dir}hotel_id_to_idx.json') as f:
     hotel_id_to_idx = json.load(f)
-with open('hotel_idx_to_id.json') as f:
+with open(f'{base_dir}hotel_idx_to_id.json') as f:
     idx_to_hotel_id = {int(k): v for k, v in json.load(f).items()}
 
 

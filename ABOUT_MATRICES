@@ -25,7 +25,7 @@ Mappings saved: user_id_to_idx.json, idx_to_user_id.json
 You then used FAISS to compute top-k similar users and built a sparse user-user similarity matrix (shape = 62006 x 62006).
 
 Saved as: metadata_user_user.npz
-✅ Excellent approach for user-based content similarity using FAISS (very efficient).
+✅ Excellent approach for user-based content similarity using FAISS (very efficient). USER_DF.csv
 
 ✅ 3. Hotel Metadata Feature Matrix (Content-Based Hotel Similarity)
 You engineered hotel features from:

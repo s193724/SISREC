@@ -5,23 +5,23 @@ import joblib
 import json
 import pandas as pd
 from collections import defaultdict
-
+base_dir = '/Users/filiporlikowski/Documents/SISREC_PROJECT/Recommendation_System_Logic_Code/'
 # --- Load persistent data ---
-user_features_sparse = load_npz('user_features_sparse.npz')
-user_item_matrix = load_npz('user_hotel_matrix.npz')
-user_features_collab = load_npz('user_features_collab.npz')
-hotel_meta_df = pd.read_csv('hotel_df.csv')
+user_features_sparse = load_npz(f'{base_dir}user_features_sparse.npz')
+user_item_matrix = load_npz(f'{base_dir}user_hotel_matrix.npz')
+user_features_collab = load_npz(f'{base_dir}user_features_collab.npz')
+hotel_meta_df = pd.read_csv(f'{base_dir}hotel_df.csv')
 hotel_meta_df.set_index('offering_id', inplace=True)
 
-with open('user_id_to_idx.json') as f:
+with open(f'{base_dir}user_id_to_idx.json') as f:
     user_id_to_idx = json.load(f)
-with open('idx_to_user_id.json') as f:
+with open(f'{base_dir}idx_to_user_id.json') as f:
     idx_to_user_id = {int(k): v for k, v in json.load(f).items()}
-with open('hotel_idx_to_id.json') as f:
+with open(f'{base_dir}hotel_idx_to_id.json') as f:
     idx_to_hotel_id = {int(k): v for k, v in json.load(f).items()}
 
-scaler = joblib.load('scaler.pkl')
-vectorizer_location = joblib.load('vectorizer_location.pkl')
+scaler = joblib.load(f'{base_dir}scaler.pkl')
+vectorizer_location = joblib.load(f'{base_dir}vectorizer_location.pkl')
 
 
 def cold_start_recommendation(user_id, top_k=10):
@@ -85,10 +85,10 @@ def cold_start_recommendation_collab(user_id, top_k=10):
     # Load hotel metadata matrix and other resources
     hotel_features_sparse = load_npz("hotel_features.npz")
 
-    with open('hotel_idx_to_id.json', 'r') as f:
+    with open(f'{base_dir}hotel_idx_to_id.json', 'r') as f:
         idx_to_hotel_id = {int(k): v for k, v in json.load(f).items()}
 
-    ohe = joblib.load('hotel_region_ohe.pkl')
+    ohe = joblib.load(f'{base_dir}hotel_region_ohe.pkl')
 
     # Constants for feature indices (adjust if your order changes!)
     # [service, cleanliness, overall, value, location, sleep_quality, rooms, weighted_score, region_onehot...]
@@ -230,8 +230,8 @@ def cold_start_recommendation_combined(user_id, mode="user", top_k=10):
 
         elif mode == "hotel":
             # === HOTEL-BASED COLD START ===
-            hotel_features_sparse = load_npz("hotel_features.npz")
-            ohe = joblib.load('hotel_region_ohe.pkl')
+            hotel_features_sparse = load_npz(f'{base_dir}hotel_features.npz')
+            ohe = joblib.load(f'{base_dir}hotel_region_ohe.pkl')
 
             def safe_float(prompt):
                 try:
@@ -317,3 +317,46 @@ def apply_city_penalty(recommendations):
             adjusted.append((hotel_id, score * penalty))
     adjusted.sort(key=lambda x: x[1], reverse=True)
     return adjusted[:10]
+
+
+
+# user_feature_matrix 5000x10
+#     user_id preference num_cities
+# us1   1         4          3
+# us2
+# us3
+# us4
+
+#     us1 us2
+# us1   1  0.5
+# us2
+# us_new /// we dont do it 5001x5001
+
+# us_new user id preferences = user vector *(cosine_similarity) user_features matrix
+# update user_simillarity matrix 5000x5000, 50001x5001
+# user_id_to_idx 
+# user x item matrix 5000x1000, 50001"x1000  " is an empty row
+
+# 50001x5001
+#  for user id not in user_id_to_idx:
+# cold_start_recommendation
+# option1 
+#     user vector using metadata, if user skips a variable input field then fill with median(col.variable)
+# option2
+#     used vector based on preferences
+    
+# alpha X user similarity matrix based on metadata * Beta X user simlarity matrix based on preferences
+# content_based RS             
+# 
+# user_simi_matrix, user_item_matrix, hotel_similarity matrix
+#alpha, beta
+#     id no_rooms regionsNY   regionLA regionCA
+# h1               1              0       0
+# h2              0               0        1
+# h3
+
+# hotel x user matrix
+
+# h1
+
+# h2

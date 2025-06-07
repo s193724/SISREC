@@ -1,0 +1,119 @@
+#increasing alpha means more collaborative filtering
+#decreasing alpha means more content-based
+    # avg_prec, avg_rec = evaluate_model(       #no city penalty
+    #     user_item_train_path,
+    #     user_item_test_path,
+    #     user_id_to_idx,
+    #     idx_to_user_id,
+    #     idx_to_hotel_id,
+    #     user_similarity,
+    #     hotel_similarity,
+    #     top_k=10,
+    #     alpha=0.7
+    # )
+    #Evaluated 15495 users
+# Average Precision@10: 0.1077
+# Average Recall@10: 0.9726
+
+# avg_prec, avg_rec = evaluate_model(
+#         user_item_train_path,
+#         user_item_test_path,
+#         user_id_to_idx,
+#         idx_to_user_id,
+#         idx_to_hotel_id,
+#         user_similarity,
+#         hotel_similarity,
+#         top_k=10,
+#         alpha=0.5
+#     )
+#
+# Average Precision@10: 0.1071
+# Average Recall@10: 0.9676
+
+# avg_prec, avg_rec = evaluate_model(
+#         user_item_train_path,
+#         user_item_test_path,
+#         user_id_to_idx,
+#         idx_to_user_id,
+#         idx_to_hotel_id,
+#         user_similarity,
+#         hotel_similarity,
+#         top_k=10,
+#         alpha=0.1
+#     )
+# Evaluated 15495 users
+# Average Precision@10: 0.1011
+# Average Recall@10: 0.9234
+
+# avg_prec, avg_rec = evaluate_model(
+#         user_item_train_path,
+#         user_item_test_path,
+#         user_id_to_idx,
+#         idx_to_user_id,
+#         idx_to_hotel_id,
+#         user_similarity,
+#         hotel_similarity,
+#         top_k=10,
+#         alpha=5
+#     )
+# Evaluated 15495 users
+# Average Precision@10: 0.1074
+# Average Recall@10: 0.9708
+
+# avg_prec, avg_rec = evaluate_non_personalized(
+#         user_item_test_path,
+#         idx_to_hotel_id,
+#         top_k=10,
+#         diversify=False
+#     )
+# Evaluated 15495 users
+# Average Precision@10: 0.0000
+# Average Recall@10: 0.0000
+
+
+
+# test_users_user_mode = load_test_users_user_mode('test_users_user_mode.csv')
+# test_users_hotel_mode = load_test_users_hotel_mode('test_users_hotel_mode.csv')
+#
+# # Call evaluation functions
+# evaluate_cold_start_user_mode(test_users_user_mode, top_k=10)
+# evaluate_cold_start_hotel_mode(test_users_hotel_mode, top_k=10)
+
+
+city_penalty = {
+        "New York City": 0.6,
+        "Houston": 0.85,
+        "San Antonio": 0.9,
+    }
+
+# evaluate_hybrid_with_city_penalty(
+#         user_item_train_path,
+#         user_item_test_path,
+#         user_id_to_idx,
+#         idx_to_user_id,
+#         idx_to_hotel_id,
+#         user_similarity,
+#         hotel_similarity,
+#         hotel_meta_df = pd.read_csv(f'{base_dir}hotel_df.csv'),
+#         top_k=10,
+#         alpha=0.7,
+#         city_penalty=city_penalty
+#     )
+# Average Precision@10 with city penalty: 0.1077
+# Average Recall@10 with city penalty: 0.9726
+
+# evaluate_hybrid_with_city_penalty(
+#         user_item_train_path,
+#         user_item_test_path,
+#         user_id_to_idx,
+#         idx_to_user_id,
+#         idx_to_hotel_id,
+#         user_similarity,
+#         hotel_similarity,
+#         hotel_meta_df = pd.read_csv(f'{base_dir}hotel_df.csv'),
+#         top_k=10,
+#         alpha=0.2,
+#         city_penalty=city_penalty
+#     )
+# Average Precision@10 with city penalty: 0.1043
+# Average Recall@10 with city penalty: 0.9472

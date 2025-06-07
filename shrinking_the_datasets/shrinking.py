@@ -2,10 +2,9 @@ import pandas as pd
 
 # Load the CSVs
 users_df = pd.read_csv("USER_DF.csv")
-reviews_df = pd.read_csv("REVIEWS_DF.csv")
-hotels_df = pd.read_csv("hotel_df.csv")
+reviews_df = pd.read_csv("../creation_test_train_and_evaluation/REVIEWS_DF.csv")
+hotels_df = pd.read_csv("../creation_test_train_and_evaluation/hotel_df.csv")
 
-# 1. Keep only 35% of users (i.e., reduce by 65%)
 reduced_users_df = users_df.sample(frac=0.8, random_state=42)
 
 # 2. Keep only reviews made by those users
